@@ -123,10 +123,31 @@ res.json({updateMemory, msg: "Memoria atualizada com sucesso"})
 
 }
 
+const toggleFavorite = async(req, res) => {
+  try {
+    
+    const memory =await Memory.findById(req.params.id)
+
+    if(!memory) {
+      return res.status(404).json({msg: "memória não encontrada"})
+    }
+
+    memory.favorite = !memory.favorite
+
+    await memory.save()
+
+    res.json({msg: "Adicionada aos favoritos", memory})
+
+  } catch (error) {
+    res.status(500).send("Ocorreu um erro")
+  }
+}
+
 module.exports = {
     createMemory,
     getMemories,
     getMemory,
     deleteMemory,
-    updateMemory
+    updateMemory,
+    toggleFavorite
 }
