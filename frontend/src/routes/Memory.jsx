@@ -14,6 +14,9 @@ const Memory = () => {
     const [memory, setMemory] = useState(null)
     const [comments, setComments] = useState([])
 
+    const [name, setName] = useState("");
+    const [text, setText] = useState("")
+
     useEffect(() => {
 
         const getMemory = async() => {
@@ -27,6 +30,31 @@ const Memory = () => {
         getMemory();
     });
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+
+
+            const comment = {name, text}
+
+            const res = await axios.patch(`/memories/${memory._id}/comment/`, comment)
+
+            const lastComment = res.data.memory.comments.pop()
+
+            setComments((comments) => [...comments, lastComment])
+
+            setName('')
+            setText('')
+
+            toast.success(res.data.msg)
+            
+        } catch (error) {
+         console.log(error)   
+         toast.error(error.response.data.msg)
+        }
+    }
+
     if(!memory) return <p>Carregando...</p>;
 
   return (
@@ -36,15 +64,17 @@ const Memory = () => {
         <p>{memory.description}</p>
         <div className="comment-form">
             <h3>Envie seu comentario</h3>
-            <form >
+            <form onSubmit={handleSubmit}>
                 <label >
                     <input
                      type="text"
-                    placeholder='Seu nome'/>
+                    placeholder='Seu nome'
+                    onChange={(e) => setName(e.target.value)} value={name}/>
                 </label>
                 <label >
                     <textarea
-                    placeholder='Comentario'/>
+                    placeholder='Comentario'
+                    onChange={(e) => setText(e.target.value)} value={text}/>
                 </label>
                 <input type="submit" value="Enviar" className='btn' />
             </form>
